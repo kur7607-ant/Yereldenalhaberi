@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yereldenalhaberi - Her İlden, Her Gün</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg: #0A0E27;
+            --color-surface: #1A1F3A;
+            --color-accent: #FF3366;
+            --color-warning: #FF9500;
+            --color-info: #00D9FF;
+            --color-success: #00C48C;
+            --color-text: #FFFFFF;
+            --color-text-muted: #94A3B8;
+            --color-border: #2D3548;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.05;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, var(--color-accent) 35px, var(--color-accent) 36px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, var(--color-info) 35px, var(--color-info) 36px);
+            animation: patternMove 60s linear infinite;
+        }
+
+        @keyframes patternMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(70px, 70px); }
+        }
+
+        /* Header */
+        .header {
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-bg) 100%);
+            border-bottom: 1px solid var(--color-border);
+            padding: 2rem 1rem;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-info) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            animation: slideInDown 0.6s ease-out;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.6s ease-out 0.2s both;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            animation: fadeIn 0.6s ease-out 0.4s both;
+        }
+
+        .meta-badge {
+            padding: 0.5rem 1rem;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--color-success);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* City Tabs */
+        .city-tabs {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        .tabs-scroll {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-accent) var(--color-surface);
+        }
+
+        .tabs-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tabs-scroll::-webkit-scrollbar-track {
+            background: var(--color-surface);
+            border-radius: 3px;
+        }
+
+        .tabs-scroll::-webkit-scrollbar-thumb {
+            background: var(--color-accent);
+            border-radius: 3px;
+        }
+
+        .city-tab {
+            flex-shrink: 0;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            color: var(--color-text-muted);
+        }
+
+        .city-tab:hover {
+            border-color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+
+        .city-tab.active {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #FF1744 100%);
+            border-color: var(--color-accent);
+            color: white;
+        }
+
+        .city-tab-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--color-info);
+            color: var(--color-bg);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border: 2px solid var(--color-bg);
+        }
+
+        /* Ortak Gündem Widget */
+        .ortak-gundem {
+            max-width: 1400px;
+            margin: 0 auto 2rem;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        .ortak-gundem-card {
+            background: linear-gradient(135deg, #2D1B69 0%, #1A1035 100%);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ortak-gundem-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 51, 102, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .ortak-gundem-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ortak-gundem-icon {
+            font-size: 1.8rem;
+        }
+
+        .ortak-gundem-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ortak-topics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .topic-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .topic-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+
+        .topic-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .topic-icon {
+            font-size: 1.2rem;
+        }
+
+        .topic-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .topic-cities {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Main Content */
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem 3rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Category Section */
+        .category-section {
+            margin-bottom: 3rem;
+            animation: slideInUp 0.5s ease-out both;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .category-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .category-icon.politics {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .category-icon.street {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .category-icon.highlights {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .category-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+        }
+
+        .category-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        /* Sub Category Tabs */
+        .sub-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .sub-tab {
+            padding: 0.5rem 1rem;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--color-text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sub-tab:hover {
+            border-color: var(--color-accent);
+            color: var(--color-text);
+        }
+
+        .sub-tab.active {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+            color: white;
+        }
+
+        .sub-tab-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        /* News Grid */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .news-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 14px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .news-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-accent);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .news-card:hover {
+            border-color: var(--color-accent);
+            transform: translateY(-4px);
+        }
+
+        .news-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .news-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .news-priority {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 700;
+        }
+
+        .priority-urgent {
+            color: var(--color-accent);
+        }
+
+        .priority-important {
+            color: var(--color-warning);
+        }
+
+        .priority-info {
+            color: var(--color-info);
+        }
+
+        .news-source {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--color-info);
+        }
+
+        .news-time {
+            color: var(--color-text-muted);
+            margin-left: auto;
+        }
+
+        .news-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .news-excerpt {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .news-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-text-muted);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--color-text-muted);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Animations */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ortak-topics {
+                grid-template-columns: 1fr;
+            }
+
+            .category-title {
+                font-size: 1.3rem;
+            }
+
+            .sub-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Mock Data with new structure
+        const mockData = {
+            ortakGundem: [
+                {
+                    keyword: "yangın",
+                    icon: "🔥",
+                    count: 3,
+                    cities: ["Antalya", "İzmir", "Denizli"]
+                },
+                {
+                    keyword: "su kesintisi",
+                    icon: "💧",
+                    count: 4,
+                    cities: ["İstanbul", "Ankara", "İzmir", "Antalya"]
+                },
+                {
+                    keyword: "fiyat artışı",
+                    icon: "💰",
+                    count: 5,
+                    cities: ["İstanbul", "Ankara", "İzmir", "Antalya", "Denizli"]
+                }
+            ],
+            cities: {
+                "Istanbul": {
+                    yerel_siyaset: [
+                        {
+                            baslik: "İBB Meclisi'nden Toplu Ulaşım Kararı",
+                            ozet: "İstanbul Büyükşehir Belediye Meclisi, toplu ulaşımda yeni düzenlemeleri kabul etti.",
+                            kaynak: "İstanbul Gazetesi",
+                            tarih: "2 saat önce",
+                            priority: "info",
+                            tags: ["belediye", "ulaşım"]
+                        }
+                    ],
+                    sokak_gundemi: {
+                        polisiye: [
+                            {
+                                baslik: "Kadıköy'de Dolandırıcılık Operasyonu",
+                                ozet: "Telefon dolandırıcılığı yapan çete, emniyet ekiplerince yakalandı. 8 kişi gözaltına alındı.",
+                                kaynak: "Hürriyet İstanbul",
+                                tarih: "1 saat önce",
+                                priority: "important",
+                                tags: ["polisiye", "operasyon"]
+                            },
+                            {
+                                baslik: "Beyoğlu'nda Hırsızlık Şüphelisi Yakalandı",
+                                ozet: "İşyerlerinden hırsızlık yapan şüpheli, güvenlik kameralarından tespit edildi.",
+                                kaynak: "İstanbul Gazetesi",
+                                tarih: "3 saat önce",
+                                priority: "important",
+                                tags: ["hırsızlık"]
+                            }
+                        ],
+                        afet_kaza: [
+                            {
+                                baslik: "Boğaziçi Köprüsü'nde Zincirleme Kaza",
+                                ozet: "Sis nedeniyle köprüde 5 aracın karıştığı zincirleme kaza meydana geldi. 3 kişi yaralandı.",
+                                kaynak: "Sabah İstanbul",
+                                tarih: "30 dakika önce",
+                                priority: "urgent",
+                                tags: ["kaza", "trafik"]
+                            }
+                        ],
+                        imar_yapi: [
+                            {
+                                baslik: "Beykoz'da Kaçak Villa Yıkıldı",
+                                ozet: "Orman alanına ruhsatsız yapılan villa, belediye ekipleri tarafından yıkıldı.",
+                                kaynak: "Yerel Haberim",
+                                tarih: "4 saat önce",
+                                priority: "important",
+                                tags: ["imar", "yıkım"]
+                            }
+                        ],
+                        gunluk_yasam: [
+                            {
+                                baslik: "Pazar Yerlerinde Fiyat Artışı Tepkisi",
+                                ozet: "Kadıköy ve Beşiktaş pazarlarında sebze-meyve fiyatlarındaki artış vatandaşların tepkisine neden oldu.",
+                                kaynak: "İstanbul Gazetesi",
+                                tarih: "2 saat önce",
+                                priority: "info",
+                                tags: ["fiyat", "pazar"]
+                            }
+                        ]
+                    },
+                    one_cikanlar: [
+                        {
+                            baslik: "Galatasaray Şampiyonlar Ligi'nde Finale Yükseldi",
+                            ozet: "Galatasaray tarihi başarıya imza attı. Şehir kutlamalara hazırlanıyor.",
+                            kaynak: "Sabah İstanbul",
+                            tarih: "6 saat önce",
+                            priority: "info",
+                            tags: ["spor", "futbol"]
+                        }
+                    ]
+                },
+                "Ankara": {
+                    yerel_siyaset: [
+                        {
+                            baslik: "Başkent'e Yeni Metro Hattı Onayı",
+                            ozet: "Ankara Büyükşehir Belediyesi, Batıkent-Sincan metro hattı projesine onay verdi.",
+                            kaynak: "Başkent Gazetesi",
+                            tarih: "2 saat önce",
+                            priority: "info",
+                            tags: ["metro", "ulaşım"]
+                        }
+                    ],
+                    sokak_gundemi: {
+                        polisiye: [],
+                        afet_kaza: [],
+                        imar_yapi: [],
+                        gunluk_yasam: [
+                            {
+                                baslik: "Kızılay'da Yaya Trafiği Yoğun",
+                                ozet: "Hafta sonu Kızılay'da yoğun bir yaya trafiği yaşanıyor.",
+                                kaynak: "Medya Ankara",
+                                tarih: "3 saat önce",
+                                priority: "info",
+                                tags: ["Kızılay", "alışveriş"]
+                            }
+                        ]
+                    },
+                    one_cikanlar: [
+                        {
+                            baslik: "Ankara Keman Festivali Başladı",
+                            ozet: "5. Uluslararası Ankara Keman Festivali CSO konser salonunda başladı.",
+                            kaynak: "Zafer Gazetesi",
+                            tarih: "8 saat önce",
+                            priority: "info",
+                            tags: ["kültür", "festival"]
+                        }
+                    ]
+                },
+                "Izmir": {
+                    yerel_siyaset: [
+                        {
+                            baslik: "Körfez Geçişi Projesi Hızlanıyor",
+                            ozet: "İzmir Körfezi geçiş projesi için yeni ihale açıldı.",
+                            kaynak: "Ege Telgraf",
+                            tarih: "1 saat önce",
+                            priority: "info",
+                            tags: ["proje", "körfez"]
+                        }
+                    ],
+                    sokak_gundemi: {
+                        polisiye: [],
+                        afet_kaza: [],
+                        imar_yapi: [],
+                        gunluk_yasam: [
+                            {
+                                baslik: "Balık Fiyatları Düştü",
+                                ozet: "Balık halinde hamsi ve çupra fiyatlarında düşüş yaşandı.",
+                                kaynak: "Ege Olay",
+                                tarih: "4 saat önce",
+                                priority: "info",
+                                tags: ["fiyat", "balık"]
+                            }
+                        ]
+                    },
+                    one_cikanlar: [
+                        {
+                            baslik: "Göztepe Play-Off'a Yükseldi",
+                            ozet: "Göztepe, play-off'a yükselmeyi garantiledi.",
+                            kaynak: "Ege Telgraf",
+                            tarih: "6 saat önce",
+                            priority: "info",
+                            tags: ["spor", "futbol"]
+                        }
+                    ]
+                },
+                "Antalya": {
+                    yerel_siyaset: [
+                        {
+                            baslik: "Turizm Bölgelerine Yeni Düzenleme",
+                            ozet: "Antalya Büyükşehir Belediyesi, turizm bölgelerinde yeni düzenlemelere gitti.",
+                            kaynak: "Antalya Körfez",
+                            tarih: "3 saat önce",
+                            priority: "info",
+                            tags: ["turizm", "belediye"]
+                        }
+                    ],
+                    sokak_gundemi: {
+                        polisiye: [],
+                        afet_kaza: [],
+                        imar_yapi: [],
+                        gunluk_yasam: [
+                            {
+                                baslik: "Lara Plajları Temizlendi",
+                                ozet: "Belediye ekipleri Lara sahillerinde kapsamlı temizlik çalışması yaptı.",
+                                kaynak: "Haber Antalya",
+                                tarih: "4 saat önce",
+                                priority: "info",
+                                tags: ["plaj", "temizlik"]
+                            }
+                        ]
+                    },
+                    one_cikanlar: [
+                        {
+                            baslik: "Film Festivali Tarihleri Açıklandı",
+                            ozet: "60. Uluslararası Antalya Film Festivali ekim ayında düzenlenecek.",
+                            kaynak: "My Gazete",
+                            tarih: "7 saat önce",
+                            priority: "info",
+                            tags: ["kültür", "film"]
+                        }
+                    ]
+                },
+                "Denizli": {
+                    yerel_siyaset: [
+                        {
+                            baslik: "Pamukkale Koruma Projesi Onaylandı",
+                            ozet: "UNESCO Dünya Mirası Pamukkale için yeni koruma projesi meclisten geçti.",
+                            kaynak: "Gazete Şehir",
+                            tarih: "2 saat önce",
+                            priority: "info",
+                            tags: ["pamukkale", "unesco"]
+                        }
+                    ],
+                    sokak_gundemi: {
+                        polisiye: [],
+                        afet_kaza: [],
+                        imar_yapi: [],
+                        gunluk_yasam: [
+                            {
+                                baslik: "Çarşı Esnafından Fiyat İndirimi",
+                                ozet: "Denizli çarşısında esnaflar şubat ayı kampanyası başlattı.",
+                                kaynak: "Haber20 Denizli",
+                                tarih: "3 saat önce",
+                                priority: "info",
+                                tags: ["esnaf", "kampanya"]
+                            }
+                        ]
+                    },
+                    one_cikanlar: [
+                        {
+                            baslik: "Denizlispor Zirveye Tutundu",
+                            ozet: "Denizlispor, deplasmanda aldığı galibiyetle zirve yarışını sürdürüyor.",
+                            kaynak: "Objektif 20",
+                            tarih: "6 saat önce",
+                            priority: "info",
+                            tags: ["spor", "denizlispor"]
+                        }
+                    ]
+                }
+            }
+        };
+
+        const cities = [
+            { id: "Istanbul", name: "İstanbul", count: 8 },
+            { id: "Ankara", name: "Ankara", count: 3 },
+            { id: "Izmir", name: "İzmir", count: 3 },
+            { id: "Antalya", name: "Antalya", count: 3 },
+            { id: "Denizli", name: "Denizli", count: 3 }
+        ];
+
+        const subCategories = {
+            sokak_gundemi: [
+                { id: "polisiye", name: "🚨 Polisiye", icon: "🚨" },
+                { id: "afet_kaza", name: "🔥 Afet & Kaza", icon: "🔥" },
+                { id: "imar_yapi", name: "🏗️ İmar", icon: "🏗️" },
+                { id: "gunluk_yasam", name: "🚦 Günlük Yaşam", icon: "🚦" }
+            ]
+        };
+
+        const priorityIcons = {
+            urgent: "🚨",
+            important: "⚠️",
+            info: "ℹ️"
+        };
+
+        function App() {
+            const [selectedCity, setSelectedCity] = useState("Istanbul");
+            const [selectedSubCategory, setSelectedSubCategory] = useState("all");
+            const [currentTime, setCurrentTime] = useState(new Date());
+
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    setCurrentTime(new Date());
+                }, 60000);
+                return () => clearInterval(timer);
+            }, []);
+
+            const formatDate = (date) => {
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                return date.toLocaleDateString('tr-TR', options);
+            };
+
+            const cityData = mockData.cities[selectedCity];
+
+            const getSokakGundemiNews = () => {
+                if (!cityData?.sokak_gundemi) return [];
+                
+                if (selectedSubCategory === "all") {
+                    return [
+                        ...cityData.sokak_gundemi.polisiye,
+                        ...cityData.sokak_gundemi.afet_kaza,
+                        ...cityData.sokak_gundemi.imar_yapi,
+                        ...cityData.sokak_gundemi.gunluk_yasam
+                    ];
+                }
+                
+                return cityData.sokak_gundemi[selectedSubCategory] || [];
+            };
+
+            const getSubCategoryCount = (subCat) => {
+                return cityData?.sokak_gundemi?.[subCat]?.length || 0;
+            };
+
+            const getTotalSokakGundemiCount = () => {
+                if (!cityData?.sokak_gundemi) return 0;
+                return Object.values(cityData.sokak_gundemi).reduce((total, arr) => total + arr.length, 0);
+            };
+
+            return (
+                <div className="app">
+                    <header className="header">
+                        <div className="header-content">
+                            <h1 className="logo">YERELDENALHABERİ</h1>
+                            <p className="tagline">Türkiye'nin Her İlinden, Her Gün Yerel Gündem</p>
+                            <div className="header-meta">
+                                <div className="meta-badge">
+                                    <span className="pulse-dot"></span>
+                                    Canlı
+                                </div>
+                                <div className="meta-badge">
+                                    📅 {formatDate(currentTime)}
+                                </div>
+                                <div className="meta-badge">
+                                    📍 5 Pilot İl
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div className="city-tabs">
+                        <div className="tabs-scroll">
+                            {cities.map((city) => (
+                                <button
+                                    key={city.id}
+                                    className={`city-tab ${selectedCity === city.id ? 'active' : ''}`}
+                                    onClick={() => {
+                                        setSelectedCity(city.id);
+                                        setSelectedSubCategory("all");
+                                    }}
+                                >
+                                    {city.name}
+                                    <span className="city-tab-count">{city.count}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {mockData.ortakGundem.length > 0 && (
+                        <div className="ortak-gundem">
+                            <div className="ortak-gundem-card">
+                                <div className="ortak-gundem-header">
+                                    <span className="ortak-gundem-icon">📊</span>
+                                    <h2 className="ortak-gundem-title">ORTAK GÜNDEM</h2>
+                                </div>
+                                <div className="ortak-topics">
+                                    {mockData.ortakGundem.map((topic, idx) => (
+                                        <div key={idx} className="topic-item">
+                                            <div className="topic-header">
+                                                <span className="topic-icon">{topic.icon}</span>
+                                                <span className="topic-title">{topic.keyword}</span>
+                                            </div>
+                                            <div className="topic-cities">
+                                                {topic.count} ilde → {topic.cities.join(", ")}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <main className="content">
+                        {/* Yerel Siyaset */}
+                        <div className="category-section">
+                            <div className="category-header">
+                                <div className="category-title-wrap">
+                                    <div className="category-icon politics">🏛️</div>
+                                    <h2 className="category-title">Yerel Siyaset</h2>
+                                </div>
+                                <span className="category-count">
+                                    {cityData?.yerel_siyaset?.length || 0} haber
+                                </span>
+                            </div>
+                            {cityData?.yerel_siyaset?.length > 0 ? (
+                                <div className="news-grid">
+                                    {cityData.yerel_siyaset.map((news, idx) => (
+                                        <div key={idx} className="news-card">
+                                            <div className="news-meta">
+                                                <span className={`news-priority priority-${news.priority}`}>
+                                                    {priorityIcons[news.priority]}
+                                                </span>
+                                                <span className="news-source">{news.kaynak}</span>
+                                                <span className="news-time">🕐 {news.tarih}</span>
+                                            </div>
+                                            <h3 className="news-title">{news.baslik}</h3>
+                                            <p className="news-excerpt">{news.ozet}</p>
+                                            <div className="news-tags">
+                                                {news.tags.map((tag, tagIdx) => (
+                                                    <span key={tagIdx} className="tag">#{tag}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="empty-state">
+                                    <div className="empty-icon">📰</div>
+                                    <p>Bu kategoride henüz haber bulunmuyor</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Sokağın Gündemi */}
+                        <div className="category-section">
+                            <div className="category-header">
+                                <div className="category-title-wrap">
+                                    <div className="category-icon street">🚦</div>
+                                    <h2 className="category-title">Sokağın Gündemi</h2>
+                                </div>
+                                <span className="category-count">
+                                    {getTotalSokakGundemiCount()} haber
+                                </span>
+                            </div>
+                            
+                            <div className="sub-tabs">
+                                <button
+                                    className={`sub-tab ${selectedSubCategory === 'all' ? 'active' : ''}`}
+                                    onClick={() => setSelectedSubCategory('all')}
+                                >
+                                    Tümü
+                                    <span className="sub-tab-count">{getTotalSokakGundemiCount()}</span>
+                                </button>
+                                {subCategories.sokak_gundemi.map((subCat) => (
+                                    <button
+                                        key={subCat.id}
+                                        className={`sub-tab ${selectedSubCategory === subCat.id ? 'active' : ''}`}
+                                        onClick={() => setSelectedSubCategory(subCat.id)}
+                                    >
+                                        {subCat.name}
+                                        <span className="sub-tab-count">{getSubCategoryCount(subCat.id)}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {getSokakGundemiNews().length > 0 ? (
+                                <div className="news-grid">
+                                    {getSokakGundemiNews().map((news, idx) => (
+                                        <div key={idx} className="news-card">
+                                            <div className="news-meta">
+                                                <span className={`news-priority priority-${news.priority}`}>
+                                                    {priorityIcons[news.priority]}
+                                                </span>
+                                                <span className="news-source">{news.kaynak}</span>
+                                                <span className="news-time">🕐 {news.tarih}</span>
+                                            </div>
+                                            <h3 className="news-title">{news.baslik}</h3>
+                                            <p className="news-excerpt">{news.ozet}</p>
+                                            <div className="news-tags">
+                                                {news.tags.map((tag, tagIdx) => (
+                                                    <span key={tagIdx} className="tag">#{tag}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="empty-state">
+                                    <div className="empty-icon">📰</div>
+                                    <p>Bu kategoride henüz haber bulunmuyor</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Öne Çıkanlar */}
+                        <div className="category-section">
+                            <div className="category-header">
+                                <div className="category-title-wrap">
+                                    <div className="category-icon highlights">⭐</div>
+                                    <h2 className="category-title">Öne Çıkanlar</h2>
+                                </div>
+                                <span className="category-count">
+                                    {cityData?.one_cikanlar?.length || 0} haber
+                                </span>
+                            </div>
+                            {cityData?.one_cikanlar?.length > 0 ? (
+                                <div className="news-grid">
+                                    {cityData.one_cikanlar.map((news, idx) => (
+                                        <div key={idx} className="news-card">
+                                            <div className="news-meta">
+                                                <span className={`news-priority priority-${news.priority}`}>
+                                                    {priorityIcons[news.priority]}
+                                                </span>
+                                                <span className="news-source">{news.kaynak}</span>
+                                                <span className="news-time">🕐 {news.tarih}</span>
+                                            </div>
+                                            <h3 className="news-title">{news.baslik}</h3>
+                                            <p className="news-excerpt">{news.ozet}</p>
+                                            <div className="news-tags">
+                                                {news.tags.map((tag, tagIdx) => (
+                                                    <span key={tagIdx} className="tag">#{tag}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="empty-state">
+                                    <div className="empty-icon">📰</div>
+                                    <p>Bu kategoride henüz haber bulunmuyor</p>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
